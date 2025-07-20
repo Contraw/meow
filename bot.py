@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 # --- CONFIGURATION ---
 # IMPORTANT: Replace this with the token from BotFather
-BOT_TOKEN = '7964289543:AAFkO6oWVHKzyPF2TU8c6Ft1gvg5KVkKyoM' 
+BOT_TOKEN = '7930041841:AAEfeEeKZkIiy_nxCLDmlGtpsra609JL0Ic' 
 
 # The username of the account that will receive the notifications (without the '@')
 TARGET_USERNAME = 'marirhaf' 
