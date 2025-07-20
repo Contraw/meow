@@ -33,15 +33,24 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     global TARGET_CHAT_ID
     user = update.effective_user
 
-    logger.info(f"Received /start command from user: @{user.username} (ID: {user.id})")
+    # --- NEW FEATURE: Log sender's info on /start ---
+    logger.info(f"Received /start command from user: @{user.username} (Chat ID: {user.id})")
 
     # Check if the user sending /start is the intended target
     if user.username == TARGET_USERNAME:
         TARGET_CHAT_ID = user.id
         logger.info(f"SUCCESS: Target user authorized. Chat ID set to: {TARGET_CHAT_ID}")
+        
+        # --- NEW FEATURE: Send confirmation message ---
         await update.message.reply_text(
             f"✅ You are authorized! I will now forward all notifications to you."
         )
+        await context.bot.send_message(
+            chat_id=TARGET_CHAT_ID,
+            text="⚙️ Bot is active and working! Waiting for notifications from websites..."
+        )
+        # --- END NEW FEATURE ---
+        
     else:
         logger.warning(f"Unauthorized user @{user.username} tried to use /start.")
         await update.message.reply_text(
@@ -54,10 +63,14 @@ async def forward_message_handler(update: Update, context: ContextTypes.DEFAULT_
     Receives a message sent to the bot and forwards it to the target user.
     """
     global TARGET_CHAT_ID
-
-    # The bot receives the message from your website's API call
+    
+    user = update.effective_user
     received_text = update.message.text
-    logger.info(f"Received a message to forward: \n{received_text}")
+
+    # --- NEW FEATURE: Log ALL incoming messages and sender info ---
+    logger.info(f"Received message from @{user.username} (Chat ID: {user.id})")
+    logger.info(f"Message content: {received_text}")
+    # --- END NEW FEATURE ---
 
     if TARGET_CHAT_ID:
         try:
@@ -67,14 +80,14 @@ async def forward_message_handler(update: Update, context: ContextTypes.DEFAULT_
                 text=received_text,
                 parse_mode='Markdown'  # The website sends Markdown formatted text
             )
-            logger.info(f"Successfully forwarded message to {TARGET_USERNAME} (ID: {TARGET_CHAT_ID})")
+            logger.info(f"Successfully forwarded message to @{TARGET_USERNAME} (ID: {TARGET_CHAT_ID})")
         except Exception as e:
             logger.error(f"Failed to send message to target user: {e}")
     else:
         # This will be printed in your console if the target user hasn't sent /start yet
         logger.warning(
             "Message received, but TARGET_CHAT_ID is not set. "
-            f"Please have the user @{TARGET_USERNAME} send /start to the bot."
+            f"Please have the user @{TARGET_USERNAME} send the /start command to the bot."
         )
 
 
